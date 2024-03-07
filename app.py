@@ -5,25 +5,29 @@ Created on: 2024/3/6 14:34
 @file: app.py
 @author: DH
 """
-import os
 import binascii
-from flask import Flask
-from flask import render_template
-from flask import request
-from flask import redirect
-from flask import url_for
-from flask import session
+import os
 import re
 from datetime import datetime
+
 import mysql.connector
-from mysql.connector import FieldType
-import connect
+from flask import Flask, redirect, render_template, request, session, url_for
 from flask_hashing import Hashing
 
-app = Flask(__name__)
-hashing = Hashing(app)  # create an instance of hashing
+import connect
+from admin import admin_page
+from agronomists import agronomists_page
+from staff import staff_page
 
+app = Flask(__name__)
+
+
+hashing = Hashing(app)
 app.secret_key = binascii.hexlify(os.urandom(24)).decode('utf-8')
+
+app.register_blueprint(admin_page, url_prefix="/admin")
+app.register_blueprint(staff_page, url_prefix="/staff")
+app.register_blueprint(agronomists_page, url_prefix="/agronomists")
 
 db_cursor = None
 connection = None
@@ -49,23 +53,18 @@ def root():
 def login():
     msg = ''
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'role' in request.form:
-        print(request.form)
         # Create variables for easy access
         username = request.form['username']
         user_password = request.form['password']
         role = request.form['role']
         # Check if account exists using MySQL
         cursor = get_cursor()
-        print(f'SELECT * FROM {role} WHERE username = {username}')
         cursor.execute(f"SELECT * FROM {role} WHERE username = '{username}'")
         # Fetch one record and return result
         account = cursor.fetchone()
         if account is not None:
             password = account[2]
             if hashing.check_value(password, user_password, salt='abcd'):
-                # If account exists in accounts table
-                # Create session data, we can access this data in other routes
-                print(session, type(session))
                 session['logged_in'] = True
                 session['id'] = account[0]
                 session['username'] = account[1]
@@ -121,13 +120,12 @@ def register():
 @app.route('/home')
 def home():
     if 'logged_in' in session:
-        return render_template('home.html', username=session['username'], role=session['role'])
+        return redirect(url_for(f"{session['role']}.home"))
     return redirect(url_for('login'))
 
 
 @app.route('/profile')
 def profile():
-    print(session)
     if 'logged_in' in session:
         cursor = get_cursor()
         cursor.execute(f"SELECT * FROM {session['role']} WHERE username = '{session['username']}'")
@@ -140,7 +138,6 @@ def profile():
             results = {'id': account[0], 'username': account[1], 'first_name': account[3], 'last_name': account[4],
                        'position': account[5], 'email': account[6], 'phone': account[7], 'date_hired': account[8],
                        'department': account[9], 'state': account[10]}
-        print(results)
         return render_template('profile.html', account=account)
     return redirect(url_for('login'))
 
