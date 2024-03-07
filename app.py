@@ -25,38 +25,39 @@ hashing = Hashing(app)  # create an instance of hashing
 
 app.secret_key = binascii.hexlify(os.urandom(24)).decode('utf-8')
 
-dbconn = None
+db_cursor = None
 connection = None
 
 
-def getCursor():
-    global dbconn
+def get_cursor():
+    global db_cursor
     global connection
     connection = mysql.connector.connect(user=connect.dbuser,
                                          password=connect.dbpass, host=connect.dbhost,
                                          auth_plugin='mysql_native_password',
                                          database=connect.dbname, autocommit=True)
-    dbconn = connection.cursor()
-    return dbconn
+    db_cursor = connection.cursor()
+    return db_cursor
+
 
 @app.route("/")
 def root():
     return redirect("/home")
 
 
-# http://localhost:5000/login/ - this will be the login page, we need to use both GET and POST requests
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
-    # Output message if something goes wrong...
     msg = ''
-    # Check if "username" and "password" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'role' in request.form:
+        print(request.form)
         # Create variables for easy access
         username = request.form['username']
         user_password = request.form['password']
+        role = request.form['role']
         # Check if account exists using MySQL
-        cursor = getCursor()
-        cursor.execute('SELECT * FROM admin WHERE username = %s', (username,))
+        cursor = get_cursor()
+        print(f'SELECT * FROM {role} WHERE username = {username}')
+        cursor.execute(f"SELECT * FROM {role} WHERE username = '{username}'")
         # Fetch one record and return result
         account = cursor.fetchone()
         if account is not None:
@@ -64,34 +65,33 @@ def login():
             if hashing.check_value(password, user_password, salt='abcd'):
                 # If account exists in accounts table
                 # Create session data, we can access this data in other routes
-                session['loggedin'] = True
+                print(session, type(session))
+                session['logged_in'] = True
                 session['id'] = account[0]
                 session['username'] = account[1]
-                # Redirect to home page
+                session['role'] = role
                 return redirect(url_for('home'))
             else:
                 # password incorrect
                 msg = 'Incorrect password!'
         else:
-            # Account doesnt exist or username incorrect
-            msg = 'Incorrect username'
+            # Account doesn't exist or username incorrect
+            msg = f'Incorrect username in {role}'
     # Show the login form with message (if any)
     return render_template('index.html', msg=msg)
 
 
-# http://localhost:5000/register - this will be the registration page, we need to use both GET and POST requests
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    # Output message if something goes wrong...
     msg = ''
-    # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'phone' in request.form and 'email' in request.form:
         # Create variables for easy access
         username = request.form['username']
         password = request.form['password']
+        phone = request.form['phone']
         email = request.form['email']
         # Check if account exists using MySQL
-        cursor = getCursor()
+        cursor = get_cursor()
         cursor.execute('SELECT * FROM agronomists WHERE username = %s', (username,))
         account = cursor.fetchone()
         # If account exists show error and validation checks
@@ -104,10 +104,12 @@ def register():
         elif not username or not password or not email:
             msg = 'Please fill out the form!'
         else:
-            # Account doesnt exists and the form data is valid, now insert new account into accounts table
             hashed = hashing.hash_value(password, salt='abcd')
-            cursor.execute('INSERT INTO agronomists VALUES (NULL, %s, %s, %s)', (username, hashed, email,))
-            connection.commit()
+            today = datetime.today().date()
+            cursor.execute(
+                'INSERT INTO agronomists (username, password, first_name, last_name, address, email, phone, date_joined) VALUES (%s, %s, first_name, last_name, address, %s, %s, %s)',
+                (username, hashed, email, phone, today,))
+            cursor.close()
             msg = 'You have successfully registered!'
     elif request.method == 'POST':
         # Form is empty... (no POST data)
@@ -116,40 +118,39 @@ def register():
     return render_template('register.html', msg=msg)
 
 
-# http://localhost:5000/home - this will be the home page, only accessible for loggedin users
 @app.route('/home')
 def home():
-    # Check if user is loggedin
-    if 'loggedin' in session:
-        # User is loggedin show them the home page
-        return render_template('home.html', username=session['username'])
-    # User is not loggedin redirect to login page
+    if 'logged_in' in session:
+        return render_template('home.html', username=session['username'], role=session['role'])
     return redirect(url_for('login'))
 
 
-# http://localhost:5000/profile - this will be the profile page, only accessible for loggedin users
 @app.route('/profile')
 def profile():
-    # Check if user is loggedin
-    if 'loggedin' in session:
-        # We need all the account info for the user so we can display it on the profile page
-        cursor = getCursor()
-        cursor.execute('SELECT * FROM admin WHERE admin_id = %s', (session['id'],))
+    print(session)
+    if 'logged_in' in session:
+        cursor = get_cursor()
+        cursor.execute(f"SELECT * FROM {session['role']} WHERE username = '{session['username']}'")
         account = cursor.fetchone()
-        # Show the profile page with account info
+        if session['role'] == 'agronomists':
+            results = {'id': account[0], 'username': account[1], 'first_name': account[3], 'last_name': account[4],
+                       'address': account[5], 'email': account[6], 'phone': account[7], 'date_joined': account[8],
+                       'state': account[9]}
+        elif session['role'] == 'staff' or session['role'] == 'admin':
+            results = {'id': account[0], 'username': account[1], 'first_name': account[3], 'last_name': account[4],
+                       'position': account[5], 'email': account[6], 'phone': account[7], 'date_hired': account[8],
+                       'department': account[9], 'state': account[10]}
+        print(results)
         return render_template('profile.html', account=account)
-    # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
 
-# http://localhost:5000/logout - this will be the logout page
 @app.route('/logout')
 def logout():
-    # Remove session data, this will log the user out
-    session.pop('loggedin', None)
+    session.pop('logged_in', None)
     session.pop('id', None)
     session.pop('username', None)
-    # Redirect to login page
+    session.pop('role', None)
     return redirect(url_for('login'))
 
 
