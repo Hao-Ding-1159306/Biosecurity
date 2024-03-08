@@ -1,0 +1,27 @@
+{% extends 'admin_layout.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Edit Profile</h2>
+    <form action="/update_profile" method="post">
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name" value="John">
+
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name" value="Doe">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="john@example.com">
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+
+        <label for="confirm_password">Confirm Password:</label>
+        <input type="password" id="confirm_password" name="confirm_password">
+
+        <input type="submit" value="Update">
+    </form>
+</div>
+{% endblock %}

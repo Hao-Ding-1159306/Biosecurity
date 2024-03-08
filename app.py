@@ -10,17 +10,15 @@ import os
 import re
 from datetime import datetime
 
-import mysql.connector
 from flask import Flask, redirect, render_template, request, session, url_for
 from flask_hashing import Hashing
 
-import connect
 from admin import admin_page
 from agronomists import agronomists_page
+from sql.sql import get_cursor
 from staff import staff_page
 
 app = Flask(__name__)
-
 
 hashing = Hashing(app)
 app.secret_key = binascii.hexlify(os.urandom(24)).decode('utf-8')
@@ -31,17 +29,6 @@ app.register_blueprint(agronomists_page, url_prefix="/agronomists")
 
 db_cursor = None
 connection = None
-
-
-def get_cursor():
-    global db_cursor
-    global connection
-    connection = mysql.connector.connect(user=connect.dbuser,
-                                         password=connect.dbpass, host=connect.dbhost,
-                                         auth_plugin='mysql_native_password',
-                                         database=connect.dbname, autocommit=True)
-    db_cursor = connection.cursor()
-    return db_cursor
 
 
 @app.route("/")
@@ -69,7 +56,7 @@ def login():
                 session['id'] = account[0]
                 session['username'] = account[1]
                 session['role'] = role
-                return redirect(url_for('home'))
+                return redirect(url_for(f"{role}.home"))
             else:
                 # password incorrect
                 msg = 'Incorrect password!'
@@ -124,24 +111,6 @@ def home():
     return redirect(url_for('login'))
 
 
-@app.route('/profile')
-def profile():
-    if 'logged_in' in session:
-        cursor = get_cursor()
-        cursor.execute(f"SELECT * FROM {session['role']} WHERE username = '{session['username']}'")
-        account = cursor.fetchone()
-        if session['role'] == 'agronomists':
-            results = {'id': account[0], 'username': account[1], 'first_name': account[3], 'last_name': account[4],
-                       'address': account[5], 'email': account[6], 'phone': account[7], 'date_joined': account[8],
-                       'state': account[9]}
-        elif session['role'] == 'staff' or session['role'] == 'admin':
-            results = {'id': account[0], 'username': account[1], 'first_name': account[3], 'last_name': account[4],
-                       'position': account[5], 'email': account[6], 'phone': account[7], 'date_hired': account[8],
-                       'department': account[9], 'state': account[10]}
-        return render_template('profile.html', account=account)
-    return redirect(url_for('login'))
-
-
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
@@ -149,6 +118,19 @@ def logout():
     session.pop('username', None)
     session.pop('role', None)
     return redirect(url_for('login'))
+
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        old_password = request.form['old_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+        print(f'password:{old_password},{new_password}, {confirm_password}\n')
+        return redirect(url_for(f"{session['role']}.profile"))
+    return render_template('change_password.html')
 
 
 if __name__ == '__main__':
