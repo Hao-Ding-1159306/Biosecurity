@@ -129,7 +129,23 @@ def change_password():
         new_password = request.form['new_password']
         confirm_password = request.form['confirm_password']
         print(f'password:{old_password},{new_password}, {confirm_password}\n')
-        return redirect(url_for(f"{session['role']}.profile"))
+        cursor = get_cursor()
+        cursor.execute(f"SELECT * FROM {session['role']} WHERE username = '{session['username']}'")
+        # Fetch one record and return result
+        account = cursor.fetchone()
+        if account is not None:
+            password = account[2]
+            if hashing.check_value(password, old_password, salt='abcd'):
+                update_sql = "UPDATE %s SET password = %s WHERE username = %s"
+                values = (session['role'], new_password, session['username'])
+                cursor.execute(update_sql, values)
+                return redirect(url_for(f"{session['role']}.profile"))
+            else:
+                error_msg = 'old passage error.'
+                return render_template('change_password.html', error_msg=error_msg)
+        else:
+            error_msg = 'unknown error occur.'
+            return render_template('change_password.html', error_msg=error_msg)
     return render_template('change_password.html')
 
 
