@@ -42,25 +42,20 @@ def edit_profile():
         print('result:', results)
         form_data = request.form
         cursor = get_cursor()
-
-        # 构建更新语句
         sql = "UPDATE admin SET "
         update_values = []
         for key, value in form_data.items():
-            if key != 'admin_id':
+            if key != 'd':
                 sql += f"{key} = %s, "
                 update_values.append(value)
         sql = sql.rstrip(', ')
-        # 添加 WHERE 条件
-        sql += " WHERE admin_id = %s"
+        sql += " WHERE id = %s"
         update_values.append(session['id'])
-
-        # 执行更新语句
         cursor.execute(sql, update_values)
         cursor.close()
         results = search_admin(session['id'])
         print('new result:', results)
-        return render_template('admin_edit_profile.html', results=results)
+        return render_template('admin_profile.html', results=results)
     results = search_admin(session['id'])
     print('result:', results)
     return render_template('admin_edit_profile.html', results=results)

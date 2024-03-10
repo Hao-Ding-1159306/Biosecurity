@@ -15,7 +15,7 @@ from flask_hashing import Hashing
 
 from admin import admin_page
 from agronomists import agronomists_page
-from sql.sql import get_cursor
+from sql.sql import get_cursor, get_info
 from staff import staff_page
 
 app = Flask(__name__)
@@ -147,6 +147,35 @@ def change_password():
             error_msg = 'unknown error occur.'
             return render_template('change_password.html', error_msg=error_msg)
     return render_template('change_password.html')
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+def edit_profile(change_role, change_id):
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    id = session['id']
+    role = session['role']
+    if request.method == 'POST':
+        results = get_info(change_id, change_role)
+        print('result:', results)
+        form_data = request.form
+        cursor = get_cursor()
+        sql = f"UPDATE {change_role} SET "
+        update_values = []
+        for key, value in form_data.items():
+            if key != 'id':
+                sql += f"{key} = %s, "
+                update_values.append(value)
+        sql = sql.rstrip(', ')
+        sql += " WHERE id = %s"
+        update_values.append(change_id)
+        cursor.execute(sql, update_values)
+        cursor.close()
+        results = get_info(change_id, change_role)
+        print('new result:', results)
+        return render_template(f'{role}_profile.html', results=results)
+    results = get_info(id, role)
+    print('result:', results)
+    return render_template(f'{change_role}_edit_profile.html', results=results)
 
 
 if __name__ == '__main__':

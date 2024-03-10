@@ -23,7 +23,7 @@ def get_cursor():
 
 def search_admin(id: int):
     cursor = get_cursor()
-    cursor.execute(f"SELECT * FROM admin WHERE admin_id = {id}")
+    cursor.execute(f"SELECT * FROM admin WHERE id = {id}")
     columns = [col[0] for col in cursor.description]
     result = cursor.fetchone()
     cursor.close()
@@ -35,7 +35,7 @@ def search_admin(id: int):
 
 def search_staff(id: int):
     cursor = get_cursor()
-    cursor.execute(f"SELECT * FROM admin WHERE staff_id = {id}")
+    cursor.execute(f"SELECT * FROM admin WHERE id = {id}")
     columns = [col[0] for col in cursor.description]
     result = cursor.fetchone()
     cursor.close()
@@ -47,7 +47,7 @@ def search_staff(id: int):
 
 def search_agronomists(id: int):
     cursor = get_cursor()
-    cursor.execute(f"SELECT * FROM admin WHERE agros_id = {id}")
+    cursor.execute(f"SELECT * FROM admin WHERE id = {id}")
     columns = [col[0] for col in cursor.description]
     result = cursor.fetchone()
     cursor.close()
@@ -55,3 +55,12 @@ def search_agronomists(id: int):
         result_dict = dict(zip(columns, result))
         print(result_dict)
     return result
+
+def get_info(id:int,role:str):
+    if role == 'admin':
+        return search_admin(id)
+    elif role == 'staff':
+        return search_staff(id)
+    elif role == 'agronomist':
+        return search_agronomists(id)
+    raise ValueError

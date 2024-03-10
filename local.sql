@@ -4,7 +4,7 @@ use bio;
 
 CREATE TABLE IF NOT EXISTS agronomists
 (
-agros_id INT auto_increment PRIMARY KEY NOT NULL,
+id INT auto_increment PRIMARY KEY NOT NULL,
 username varchar(100) NOT NULL,
 password varchar(255) NOT NULL,
 first_name varchar(25) NOT NULL,
@@ -18,7 +18,7 @@ state tinyint default 1
 
 CREATE TABLE IF NOT EXISTS staff
 (
-staff_id INT auto_increment PRIMARY KEY NOT NULL,
+id INT auto_increment PRIMARY KEY NOT NULL,
 username varchar(100) NOT NULL,
 password varchar(255) NOT NULL,
 first_name varchar(25) NOT NULL,
@@ -33,7 +33,7 @@ state tinyint default 1
 
 CREATE TABLE IF NOT EXISTS admin
 (
-admin_id INT auto_increment PRIMARY KEY NOT NULL,
+id INT auto_increment PRIMARY KEY NOT NULL,
 username varchar(100) NOT NULL,
 password varchar(255) NOT NULL,
 first_name varchar(25) NOT NULL,
