@@ -33,29 +33,37 @@ def profile():
         return render_template('admin_profile.html', results=results)
     return redirect(url_for('login'))
 
-@admin_page.route('/edit_profile', methods=['GET', 'POST'])
-def edit_profile():
-    if 'logged_in' not in session:
-        return redirect(url_for('login'))
-    if request.method == 'POST':
-        results = search_admin(session['id'])
-        print('result:', results)
-        form_data = request.form
-        cursor = get_cursor()
-        sql = "UPDATE admin SET "
-        update_values = []
-        for key, value in form_data.items():
-            if key != 'd':
-                sql += f"{key} = %s, "
-                update_values.append(value)
-        sql = sql.rstrip(', ')
-        sql += " WHERE id = %s"
-        update_values.append(session['id'])
-        cursor.execute(sql, update_values)
-        cursor.close()
-        results = search_admin(session['id'])
-        print('new result:', results)
-        return render_template('admin_profile.html', results=results)
-    results = search_admin(session['id'])
-    print('result:', results)
-    return render_template('admin_edit_profile.html', results=results)
+
+@admin_page.route('/manage')
+def manage():
+    if 'logged_in' in session:
+        return render_template('admin_manage.html')
+    return redirect(url_for('login'))
+
+#
+# @admin_page.route('/edit_profile', methods=['GET', 'POST'])
+# def edit_profile():
+#     if 'logged_in' not in session:
+#         return redirect(url_for('login'))
+#     if request.method == 'POST':
+#         results = search_admin(session['id'])
+#         print('result:', results)
+#         form_data = request.form
+#         cursor = get_cursor()
+#         sql = "UPDATE admin SET "
+#         update_values = []
+#         for key, value in form_data.items():
+#             if key != 'd':
+#                 sql += f"{key} = %s, "
+#                 update_values.append(value)
+#         sql = sql.rstrip(', ')
+#         sql += " WHERE id = %s"
+#         update_values.append(session['id'])
+#         cursor.execute(sql, update_values)
+#         cursor.close()
+#         results = search_admin(session['id'])
+#         print('new result:', results)
+#         return render_template('admin_profile.html', results=results)
+#     results = search_admin(session['id'])
+#     print('result:', results)
+#     return render_template('admin_edit_profile.html', results=results)

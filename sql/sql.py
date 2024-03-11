@@ -35,7 +35,7 @@ def search_admin(id: int):
 
 def search_staff(id: int):
     cursor = get_cursor()
-    cursor.execute(f"SELECT * FROM admin WHERE id = {id}")
+    cursor.execute(f"SELECT * FROM staff WHERE id = {id}")
     columns = [col[0] for col in cursor.description]
     result = cursor.fetchone()
     cursor.close()
@@ -47,7 +47,7 @@ def search_staff(id: int):
 
 def search_agronomists(id: int):
     cursor = get_cursor()
-    cursor.execute(f"SELECT * FROM admin WHERE id = {id}")
+    cursor.execute(f"SELECT * FROM agronomists WHERE id = {id}")
     columns = [col[0] for col in cursor.description]
     result = cursor.fetchone()
     cursor.close()
@@ -56,7 +56,8 @@ def search_agronomists(id: int):
         print(result_dict)
     return result
 
-def get_info(id:int,role:str):
+
+def get_info(id: int, role: str):
     if role == 'admin':
         return search_admin(id)
     elif role == 'staff':
@@ -64,3 +65,16 @@ def get_info(id:int,role:str):
     elif role == 'agronomist':
         return search_agronomists(id)
     raise ValueError
+
+def get_agronomists_list():
+    cursor = get_cursor()
+    cursor.execute(f"SELECT * FROM agronomists")
+    columns = [col[0] for col in cursor.description]
+    results = cursor.fetchall()
+    cursor.close()
+    return_results = list()
+    for result in results:
+        result_dict = dict(zip(columns, result))
+        print(result_dict)
+        return_results.append(result_dict)
+    return return_results

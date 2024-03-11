@@ -15,7 +15,7 @@ from flask_hashing import Hashing
 
 from admin import admin_page
 from agronomists import agronomists_page
-from sql.sql import get_cursor, get_info
+from sql.sql import get_cursor, get_info, get_agronomists_list
 from staff import staff_page
 
 app = Flask(__name__)
@@ -111,6 +111,20 @@ def home():
     return redirect(url_for('login'))
 
 
+@app.route('/profile')
+def profile():
+    if 'logged_in' in session:
+        return redirect(url_for(f"{session['role']}.profile"))
+    return redirect(url_for('login'))
+
+
+@app.route('/manage')
+def manage():
+    if 'logged_in' in session:
+        return redirect(url_for(f"{session['role']}.manage"))
+    return redirect(url_for('login'))
+
+
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
@@ -148,7 +162,8 @@ def change_password():
             return render_template('change_password.html', error_msg=error_msg)
     return render_template('change_password.html')
 
-@app.route('/edit_profile', methods=['GET', 'POST'])
+
+@app.route('/edit_profile/<string:change_role>/<int:change_id>', methods=['GET', 'POST'])
 def edit_profile(change_role, change_id):
     if 'logged_in' not in session:
         return redirect(url_for('login'))
@@ -173,9 +188,19 @@ def edit_profile(change_role, change_id):
         results = get_info(change_id, change_role)
         print('new result:', results)
         return render_template(f'{role}_profile.html', results=results)
-    results = get_info(id, role)
+    results = get_info(change_id, change_role)
     print('result:', results)
-    return render_template(f'{change_role}_edit_profile.html', results=results)
+    return render_template(f'{change_role}_edit_profile.html', change_role=change_role, change_id=change_id,
+                           results=results)
+
+
+@app.route('/view_agronomists')
+def view_agronomists():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    results = get_agronomists_list()
+    print('result:', results)
+    return render_template('view_agronomists.html', results=results)
 
 
 if __name__ == '__main__':

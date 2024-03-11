@@ -1,0 +1,48 @@
+{% extends 'admin_layout.html' %}
+
+{% block title %}Manage{% endblock %}
+
+{% block content %}
+<h2>Administrator Manage</h2>
+<div class="block_container">
+    <div class="block">
+        <a href="{{ url_for('view_agronomists') }}">
+            <i class="fas fa-users" aria-hidden="true"></i>
+            <p>View Agronomists</p>
+        </a>
+    </div>
+    <div class="block">
+        <a href="add_agronomists.html">
+            <i class="fas fa-users-cog"></i>
+            <p>Add Agronomists</p>
+        </a>
+    </div>
+
+    <div class="block">
+        <a href="view_staff.html">
+            <i class="fas fa-user-alt" aria-hidden="true"></i>
+            <p>View Staff</p>
+        </a>
+    </div>
+    <div class="block">
+        <a href="add_staff.html">
+            <i class="fas fa-user-plus" aria-hidden="true"></i>
+            <p>Add Staff</p>
+        </a>
+    </div>
+
+    <div class="block">
+        <a href="edit_guide.html">
+            <i class="fas fa-book-reader"></i>
+            <p>Edit Guide</p>
+        </a>
+    </div>
+
+    <div class="block">
+        <a href="add_guide.html">
+            <i class="fa fa-edit" aria-hidden="true"></i>
+            <p>Add Guide</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
