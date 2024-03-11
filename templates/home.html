@@ -11,6 +11,28 @@
 
 {% block content %}
 <h2>Home Guide</h2>
-<p>weeds</p>
-<p>pests</p>
+<h3>weeds:</h3>
+<div class="block_container">
+
+    {% for weed in weeds %}
+    <div class="block">
+        <a href="{{ url_for('view_agriculture', agriculture_id=pest['agriculture_id']) }}">
+            <i class="fas fa-users" aria-hidden="true"></i>
+            <p>{{ weed.common_name }}</p>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+<h3>pests:</h3>
+<div class="block_container">
+
+    {% for pest in pests %}
+    <div class="block">
+        <a href="{{ url_for('view_agriculture', agriculture_id=pest['agriculture_id']) }}">
+            <i class="fas fa-users" aria-hidden="true"></i>
+            <p>{{ pest.common_name }}</p>
+        </a>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}

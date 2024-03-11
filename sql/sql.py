@@ -91,3 +91,16 @@ def get_staff_list():
         print(result_dict)
         return_results.append(result_dict)
     return return_results
+
+def search_pest():
+    cursor = get_cursor()
+    cursor.execute(f"SELECT * FROM agriculture WHERE agriculture_item_type = 'pest'")
+    columns = [col[0] for col in cursor.description]
+    results = cursor.fetchall()
+    cursor.close()
+    return_results = list()
+    for result in results:
+        result_dict = dict(zip(columns, result))
+        print(result_dict)
+        return_results.append(result_dict)
+    return return_results
