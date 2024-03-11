@@ -282,3 +282,7 @@ input[type="submit"]:hover {
     min-width: 100px;
 }
 
+.table-container .center-align {
+    text-align: center;
+}
+

@@ -187,7 +187,7 @@ def edit_profile(change_role, change_id):
         cursor.close()
         results = get_info(change_id, change_role)
         print('new result:', results)
-        return render_template(f'{role}_profile.html', results=results)
+        return render_template(f'{change_role}_profile.html', results=results)
     results = get_info(change_id, change_role)
     print('result:', results)
     return render_template(f'{change_role}_edit_profile.html', change_role=change_role, change_id=change_id,
@@ -237,6 +237,14 @@ def add_agronomists():
             msg = 'You have successfully add a agronomist!'
     return render_template('add_agronomists.html', msg=msg)
 
+@app.route('/delete_agronomists/<int:agronomists_id>', methods=['GET', 'POST'])
+def delete_agronomists(agronomists_id):
+    cursor = get_cursor()
+    sql = "DELETE FROM agronomists WHERE id = %s"
+    cursor.execute(sql, (agronomists_id,))
+    results = get_agronomists_list()
+    return render_template('view_agronomists.html', results=results)
+
 
 @app.route('/view_staff')
 def view_staff():
@@ -280,6 +288,15 @@ def add_staff():
             cursor.close()
             msg = 'You have successfully add a agronomist!'
     return render_template('add_staff.html', msg=msg)
+
+
+@app.route('/delete_staff/<int:staff_id>', methods=['GET', 'POST'])
+def delete_staff(staff_id):
+    cursor = get_cursor()
+    sql = "DELETE FROM staff WHERE id = %s"
+    cursor.execute(sql, (staff_id,))
+    results = get_staff_list()
+    return render_template('view_staff.html', results=results)
 
 
 if __name__ == '__main__':

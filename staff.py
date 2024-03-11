@@ -24,3 +24,9 @@ def profile():
         print('result:', results)
         return render_template('staff_profile.html', results=results)
     return redirect(url_for('login'))
+
+@staff_page.route('/manage')
+def manage():
+    if 'logged_in' in session:
+        return render_template('staff_manage.html')
+    return redirect(url_for('login'))
