@@ -1,0 +1,40 @@
+{% extends 'staff_layout.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Edit Profile</h2>
+    <form action="{{ url_for('edit_profile', change_role=change_role, change_id=change_id) }}" method="post">
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id" value="{{ results['id'] }}" disabled>
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" value="{{ results['username'] }}" disabled>
+
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name" value="{{ results['first_name'] }}">
+
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name" value="{{ results['last_name'] }}">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ results['email'] }}">
+
+        <label for="phone">Work Photo:</label>
+        <input type="text" id="phone" name="phone" value="{{ results['phone'] }}">
+
+        <label for="date_hired">Hire Date:</label>
+        <input type="text" id="date_hired" name="date_hired" value="{{ results['date_hired'] }}" disabled>
+
+        <label for="position">Position:</label>
+        <input type="text" id="position" name="position" value="{{ results['position'] }}">
+
+        <label for="department">Department:</label>
+        <input type="text" id="department" name="department" value="{{ results['department'] }}" disabled>
+
+        <input type="submit" value="Update">
+    </form>
+
+</div>
+{% endblock %}

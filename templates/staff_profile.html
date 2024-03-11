@@ -1,0 +1,52 @@
+{% extends 'staff_layout.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<h2>{{ results['username'] }} Profile</h2>
+<div>
+    <p>Your account details are below:</p>
+    <table>
+        <tr>
+            <td>ID:</td>
+            <td>{{ results['id'] }}</td>
+        </tr>
+        <tr>
+            <td>First Name:</td>
+            <td>{{ results['first_name'] }}</td>
+        </tr>
+        <tr>
+            <td>Last Name:</td>
+            <td>{{ results['last_name'] }}</td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td>{{ results['email'] }}</td>
+        </tr>
+        <tr>
+            <td>Work Photo:</td>
+            <td>{{ results['phone'] }}</td>
+        </tr>
+        <tr>
+            <td>Hire Date:</td>
+            <td>{{ results['date_hired'] }}</td>
+        </tr>
+        <tr>
+            <td>Position:</td>
+            <td>{{ results['position'] }}</td>
+        </tr>
+        <tr>
+            <td>Department:</td>
+            <td>{{ results['department'] }}</td>
+        </tr>
+        <tr>
+            <td>State:</td>
+            <td>active</td>
+        </tr>
+    </table>
+    <div class="button-container">
+        <a href="{{ url_for('edit_profile', change_role=session['role'], change_id=session['id']) }}"><i class="fa fa-edit" aria-hidden="true"></i>Edit Profile</a>
+        <a href="/change_password"><i class="fa fa-lock" aria-hidden="true"></i>Change Password</a>
+    </div>
+</div>
+{% endblock %}

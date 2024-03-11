@@ -1,0 +1,45 @@
+{% if session.get('role') == 'admin' %}
+{% extends 'admin_layout.html' %}
+{% else %}
+{% endif %}
+
+{% block title %}View Staff{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Staff List</h2>
+    {% if results %}
+    <table class="table-container">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>First Name</th>
+            <th>Lsat Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for result in results %}
+        <tr>
+            <td>{{ result.id }}</td>
+            <td>{{ result.username }}</td>
+            <td>{{ result.first_name }}</td>
+            <td>{{ result.last_name }}</td>
+            <td>{{ result.email }}</td>
+            <td>{{ result.phone }}</td>
+
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+    <p>No results found.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

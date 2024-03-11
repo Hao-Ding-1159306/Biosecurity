@@ -1,0 +1,43 @@
+{% if session.get('role') == 'admin' %}
+{% extends 'admin_layout.html' %}
+{% elif session.get('role') == 'staff' %}
+{% extends 'staff_layout.html' %}
+{% else %}
+{% endif %}
+
+{% block title %}Add Agronomist{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Add Agronomist</h2>
+    <form action="{{ url_for('add_agronomists') }}" method="post">
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password:</label>
+        <input type="text" id="password" name="password" required
+               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+               title="Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit">
+
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name">
+
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name">
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+
+        <label for="phone">Photo:</label>
+        <input type="text" id="phone" name="phone">
+
+        <div class="msg">{{ msg }}</div>
+        <input type="submit" value="Create">
+    </form>
+
+</div>
+{% endblock %}

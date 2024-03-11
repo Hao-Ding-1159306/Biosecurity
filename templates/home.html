@@ -1,8 +1,16 @@
-{% extends 'layout.html' %}
+{% if session.get('role') == 'admin' %}
+{% extends 'admin_layout.html' %}
+{% elif session.get('role') == 'staff' %}
+{% extends 'staff_layout.html' %}
+{% elif session.get('role') == 'agronomists' %}
+{% extends 'agronomists_layout.html' %}
+{% else %}
+{% endif %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h2>User Landing Page</h2>
-<p>Welcome back, {{ username }}!</p>
+<h2>Home Guide</h2>
+<p>weeds</p>
+<p>pests</p>
 {% endblock %}
