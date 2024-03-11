@@ -41,8 +41,8 @@ def search_staff(id: int):
     cursor.close()
     if result:
         result_dict = dict(zip(columns, result))
-        print(result_dict)
-    return result
+        return result_dict
+    return {}
 
 
 def search_agronomists(id: int):
@@ -53,8 +53,8 @@ def search_agronomists(id: int):
     cursor.close()
     if result:
         result_dict = dict(zip(columns, result))
-        print(result_dict)
-    return result
+        return result_dict
+    return {}
 
 
 def get_info(id: int, role: str):
@@ -62,13 +62,26 @@ def get_info(id: int, role: str):
         return search_admin(id)
     elif role == 'staff':
         return search_staff(id)
-    elif role == 'agronomist':
+    elif role == 'agronomists':
         return search_agronomists(id)
     raise ValueError
 
 def get_agronomists_list():
     cursor = get_cursor()
     cursor.execute(f"SELECT * FROM agronomists")
+    columns = [col[0] for col in cursor.description]
+    results = cursor.fetchall()
+    cursor.close()
+    return_results = list()
+    for result in results:
+        result_dict = dict(zip(columns, result))
+        print(result_dict)
+        return_results.append(result_dict)
+    return return_results
+
+def get_staff_list():
+    cursor = get_cursor()
+    cursor.execute(f"SELECT * FROM staff")
     columns = [col[0] for col in cursor.description]
     results = cursor.fetchall()
     cursor.close()

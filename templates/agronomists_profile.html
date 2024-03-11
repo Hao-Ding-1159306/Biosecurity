@@ -1,4 +1,4 @@
-{% extends 'admin_layout.html' %}
+{% extends 'agronomists_layout.html' %}
 
 {% block title %}Profile{% endblock %}
 
@@ -28,24 +28,21 @@
             <td>{{ results['phone'] }}</td>
         </tr>
         <tr>
-            <td>Hire Date:</td>
-            <td>{{ results['date_hired'] }}</td>
+            <td>Date Joined:</td>
+            <td>{{ results['date_joined'] }}</td>
         </tr>
         <tr>
-            <td>Position:</td>
-            <td>{{ results['position'] }}</td>
+            <td>Address:</td>
+            <td>{{ results['address'] }}</td>
         </tr>
-        <tr>
-            <td>Department:</td>
-            <td>{{ results['department'] }}</td>
-        </tr>
+
         <tr>
             <td>State:</td>
             <td>active</td>
         </tr>
     </table>
     <div class="button-container">
-        <a href="{{ url_for('admin.edit_profile') }}"><i class="fa fa-edit" aria-hidden="true"></i>Edit Profile</a>
+        <a href="{{ url_for('edit_profile', change_role=session['role'], change_id=session['id']) }}"><i class="fa fa-edit" aria-hidden="true"></i>Edit Profile</a>
         <a href="/change_password"><i class="fa fa-lock" aria-hidden="true"></i>Change Password</a>
     </div>
 </div>

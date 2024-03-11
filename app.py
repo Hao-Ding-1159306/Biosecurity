@@ -15,7 +15,7 @@ from flask_hashing import Hashing
 
 from admin import admin_page
 from agronomists import agronomists_page
-from sql.sql import get_cursor, get_info, get_agronomists_list
+from sql.sql import get_cursor, get_info, get_agronomists_list, get_staff_list
 from staff import staff_page
 
 app = Flask(__name__)
@@ -56,7 +56,7 @@ def login():
                 session['id'] = account[0]
                 session['username'] = account[1]
                 session['role'] = role
-                return redirect(url_for(f"{role}.home"))
+                return redirect(url_for(f"home"))
             else:
                 # password incorrect
                 msg = 'Incorrect password!'
@@ -107,7 +107,7 @@ def register():
 @app.route('/home')
 def home():
     if 'logged_in' in session:
-        return redirect(url_for(f"{session['role']}.home"))
+        return render_template('home.html')
     return redirect(url_for('login'))
 
 
@@ -201,6 +201,85 @@ def view_agronomists():
     results = get_agronomists_list()
     print('result:', results)
     return render_template('view_agronomists.html', results=results)
+
+
+@app.route('/add_agronomists', methods=['GET', 'POST'])
+def add_agronomists():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    msg = ''
+    if request.method == 'POST':
+        form_data = request.form
+        username = form_data['username']
+        password = request.form['password']
+        phone = request.form['phone']
+        email = request.form['email']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        address = request.form['address']
+        cursor = get_cursor()
+        cursor.execute('SELECT * FROM agronomists WHERE username = %s', (username,))
+        account = cursor.fetchone()
+        # If account exists show error and validation checks
+        if account:
+            msg = 'Account already exists!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only characters and numbers!'
+        elif not username or not password:
+            msg = 'Please fill out the form!'
+        else:
+            hashed = hashing.hash_value(password, salt='abcd')
+            today = datetime.today().date()
+            cursor.execute(
+                'INSERT INTO agronomists (username, password, first_name, last_name, address, email, phone, date_joined) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
+                (username, hashed, first_name, last_name, address, email, phone, today,))
+            cursor.close()
+            msg = 'You have successfully add a agronomist!'
+    return render_template('add_agronomists.html', msg=msg)
+
+
+@app.route('/view_staff')
+def view_staff():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    results = get_staff_list()
+    print('result:', results)
+    return render_template('view_staff.html', results=results)
+
+
+@app.route('/add_staff', methods=['GET', 'POST'])
+def add_staff():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    msg = ''
+    if request.method == 'POST':
+        form_data = request.form
+        username = form_data['username']
+        password = request.form['password']
+        phone = request.form['phone']
+        email = request.form['email']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        position = request.form['position']
+        cursor = get_cursor()
+        cursor.execute('SELECT * FROM staff WHERE username = %s', (username,))
+        account = cursor.fetchone()
+        # If account exists show error and validation checks
+        if account:
+            msg = 'Account already exists!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only characters and numbers!'
+        elif not username or not password:
+            msg = 'Please fill out the form!'
+        else:
+            hashed = hashing.hash_value(password, salt='abcd')
+            today = datetime.today().date()
+            cursor.execute(
+                'INSERT INTO staff (username, password, first_name, last_name, position, email, phone, date_hired, department) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                (username, hashed, first_name, last_name, position, email, phone, today, 'staff'))
+            cursor.close()
+            msg = 'You have successfully add a agronomist!'
+    return render_template('add_staff.html', msg=msg)
 
 
 if __name__ == '__main__':

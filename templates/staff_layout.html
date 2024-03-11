@@ -1,8 +1,8 @@
 {% extends 'layout.html' %}
 
 {% block navlinks %}
-<a href="{{ url_for('staff.home') }}"><i class="fas fa-home"></i>Home</a>
-<a href="{{ url_for('staff.profile') }}"><i class="fas fa-user-circle"></i>Profile</a>
-<a href="{{ url_for('staff.manage') }}"><i class="fa fa-th" aria-hidden="true"></i>Manage</a>
+<a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
+<a href="{{ url_for('profile') }}"><i class="fas fa-user-circle"></i>Profile</a>
+<a href="{{ url_for('manage') }}"><i class="fa fa-th" aria-hidden="true"></i>Manage</a>
 <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
 {% endblock %}

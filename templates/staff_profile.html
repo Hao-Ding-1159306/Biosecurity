@@ -1,4 +1,4 @@
-{% extends 'admin_layout.html' %}
+{% extends 'staff_layout.html' %}
 
 {% block title %}Profile{% endblock %}
 
@@ -45,7 +45,7 @@
         </tr>
     </table>
     <div class="button-container">
-        <a href="{{ url_for('admin.edit_profile') }}"><i class="fa fa-edit" aria-hidden="true"></i>Edit Profile</a>
+        <a href="{{ url_for('edit_profile', change_role=session['role'], change_id=session['id']) }}"><i class="fa fa-edit" aria-hidden="true"></i>Edit Profile</a>
         <a href="/change_password"><i class="fa fa-lock" aria-hidden="true"></i>Change Password</a>
     </div>
 </div>
