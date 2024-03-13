@@ -15,9 +15,12 @@
 <div class="block_container">
 
     {% for weed in weeds %}
-    <div class="block">
-        <a href="{{ url_for('view_agriculture', agriculture_id=pest['agriculture_id']) }}">
-            <i class="fas fa-users" aria-hidden="true"></i>
+    <div class="img_block">
+        <a href="{{ url_for('view_agriculture', agriculture_id=weed['agriculture_id']) }}">
+            <div class="image-container">
+                <img src="{{ url_for('static', filename=weed['primary_photos']) }}"
+                     alt="Photo">
+            </div>
             <p>{{ weed.common_name }}</p>
         </a>
     </div>
@@ -29,7 +32,10 @@
     {% for pest in pests %}
     <div class="block">
         <a href="{{ url_for('view_agriculture', agriculture_id=pest['agriculture_id']) }}">
-            <i class="fas fa-users" aria-hidden="true"></i>
+            <div class="image-container">
+                <img src="{{ url_for('static', filename=pest['primary_photos']) }}"
+                     alt="Photo">
+            </div>
             <p>{{ pest.common_name }}</p>
         </a>
     </div>

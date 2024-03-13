@@ -12,14 +12,16 @@ import uuid
 from datetime import datetime
 
 from flask import Flask, redirect, render_template, request, session, url_for
+from flask_caching import Cache
 from flask_hashing import Hashing
 
 from admin import admin_page
 from agronomists import agronomists_page
-from sql.sql import get_cursor, get_info, get_agronomists_list, get_staff_list, search_pest
+from sql.sql import get_cursor, get_info, get_agronomists_list, get_staff_list, search_pests, search_weeds, get_pictures
 from staff import staff_page
 
 app = Flask(__name__)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 hashing = Hashing(app)
 app.secret_key = binascii.hexlify(os.urandom(24)).decode('utf-8')
@@ -108,12 +110,15 @@ def register():
 @app.route('/home')
 def home():
     if 'logged_in' not in session:
+        print(session)
         return redirect(url_for('login'))
 
-    pests = search_pest()
+    pests = search_pests()
     print('pests:', pests)
+    weeds = search_weeds()
+    print('weeds:', weeds)
 
-    return render_template('home.html', pests=pests)
+    return render_template('home.html', pests=pests, weeds=weeds)
 
 
 @app.route('/profile')
@@ -190,9 +195,16 @@ def edit_profile(change_role, change_id):
         update_values.append(change_id)
         cursor.execute(sql, update_values)
         cursor.close()
-        results = get_info(change_id, change_role)
-        print('new result:', results)
-        return render_template(f'{change_role}_profile.html', results=results)
+        if role == change_role and id == change_id:
+            results = get_info(change_id, change_role)
+            print('new result:', results)
+            return render_template(f'{role}_profile.html', results=results)
+        elif change_role == 'agronomists':
+            return redirect(url_for('view_agronomists'))
+        elif change_role == 'staff':
+            return redirect(url_for('view_staff'))
+        else:
+            return redirect(url_for('home'))
     results = get_info(change_id, change_role)
     print('result:', results)
     return render_template(f'{change_role}_edit_profile.html', change_role=change_role, change_id=change_id,
@@ -340,12 +352,12 @@ def add_guide():
             num = 1
             for photo in photos:
                 filename = str(uuid.uuid4()) + os.path.splitext(photo.filename)[-1]
-                photo_path = os.path.join('upload_picture', filename)
+                photo_path = os.path.join('static', filename)
                 photo.save(photo_path)
 
                 cursor = get_cursor()
                 sql = "INSERT INTO photos (photo_url) VALUES (%s)"
-                cursor.execute(sql, (photo_path,))
+                cursor.execute(sql, (filename,))
                 photo_id = cursor.lastrowid
                 cursor.close()
                 # build connect
@@ -374,7 +386,9 @@ def view_agriculture(agriculture_id):
     cursor.close()
     if result:
         result_dict = dict(zip(columns, result))
-        return render_template('view_agriculture.html', agriculture = result_dict)
+        photo_dict = get_pictures(result_dict["agriculture_id"])
+        result_dict['photos'] = photo_dict
+        return render_template('view_agriculture.html', agriculture=result_dict)
     return url_for('home')
 
 

@@ -27,7 +27,8 @@
     <p>{{ agriculture.control }}</p>
     <label for="photos">Photos:</label>
     {% for photo in agriculture.photos %}
-    <img src="{{ url_for('static', filename='photos/' + photo) }}" alt="{{ photo }}">
+    <img src="{{ url_for('static', filename=photo['photo_url']) }}" alt="photo">
+    <p>{{ photo }}</p>
     {% endfor %}
 </div>
 

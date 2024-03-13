@@ -29,7 +29,7 @@
         <input type="email" id="email" name="email" value="{{ results['email'] }}">
 
         <label for="phone">Work Photo:</label>
-        <input type="text" id="phone" name="phone" value="{{ results['phone'] }}">
+        <input type="text" id="phone" name="phone" value="{{ results['phone'] }}" pattern="[1-9][0-9]{10}">
 
         <label for="date_hired">Hire Date:</label>
         <input type="text" id="date_hired" name="date_hired" value="{{ results['date_hired'] }}" disabled>
