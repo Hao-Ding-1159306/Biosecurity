@@ -17,7 +17,8 @@ from flask_hashing import Hashing
 
 from admin import admin_page
 from agronomists import agronomists_page
-from sql.sql import get_cursor, get_info, get_agronomists_list, get_staff_list, search_pests, search_weeds, get_pictures
+from sql.sql import (get_agronomists_list, get_cursor, get_info, get_pictures,
+                     get_staff_list, search_pests, search_weeds)
 from staff import staff_page
 
 app = Flask(__name__)
@@ -338,7 +339,7 @@ def add_guide():
         impacts = request.form['impacts']
         control = request.form['control']
         photos = request.files.getlist('photos')
-
+        print('photos:', photos)
         try:
             # add agriculture
             cursor = get_cursor()

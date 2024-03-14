@@ -10,7 +10,7 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h2>Home Guide</h2>
+<h2>Guide</h2>
 <h3>weeds:</h3>
 <div class="block_container">
 
@@ -30,7 +30,7 @@
 <div class="block_container">
 
     {% for pest in pests %}
-    <div class="block">
+    <div class="img_block">
         <a href="{{ url_for('view_agriculture', agriculture_id=pest['agriculture_id']) }}">
             <div class="image-container">
                 <img src="{{ url_for('static', filename=pest['primary_photos']) }}"

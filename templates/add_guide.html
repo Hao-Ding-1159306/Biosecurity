@@ -11,7 +11,16 @@
 <div class="container">
     <h2>Add Guide</h2>
     <form action="{{ url_for('add_guide') }}" method="post" enctype="multipart/form-data">
-        <div class="msg">{{ msg }}</div>
+        {% if msg %}
+        <script>
+            window.onload = function() {
+                var msg = "{{ msg }}";
+                if (msg.trim() !== "") {
+                    alert(msg);
+                }
+            };
+        </script>
+        {% endif %}
         <label for="agriculture_item_type">Item Type:</label>
         <select name="agriculture_item_type" id="agriculture_item_type" required>
             <option value="pest">Pest</option>
@@ -30,10 +39,27 @@
         <label for="control">Control:</label><br>
         <textarea name="control" id="control" rows="4" cols="120"></textarea><br>
 
-        <label for="photos">Select photos:</label>
+        <label for="photos">Upload photos (multiple or single):</label>
         <input type="file" name="photos" id="photos" accept="image/*" multiple required><br>
+        <div id="selectedPhotos"></div>
         <input type="submit" value="Submit">
     </form>
-
 </div>
+
+<script>
+    document.getElementById('photos').addEventListener('change', function(event) {
+    const files = event.target.files;
+    const selectedPhotosContainer = document.getElementById('selectedPhotos'); // 添加这行代码以获取容器元素
+
+
+    selectedPhotosContainer.innerHTML = '';
+
+    for (let i = 0; i < files.length; i++) {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(files[i]);
+        img.height = 100;
+        selectedPhotosContainer.appendChild(img);
+    }
+});
+</script>
 {% endblock %}

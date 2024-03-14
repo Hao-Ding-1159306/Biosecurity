@@ -69,8 +69,8 @@ CREATE TABLE IF NOT EXISTS agriculture_photos
 agriculture_id INT,  
 photo_id INT,  
 is_primary BOOLEAN NOT NULL DEFAULT FALSE,  
-FOREIGN KEY (agriculture_id) REFERENCES agriculture(agriculture_id),  
-FOREIGN KEY (photo_id) REFERENCES photos(photo_id)
+FOREIGN KEY (agriculture_id) REFERENCES agriculture(agriculture_id) ON DELETE CASCADE,
+FOREIGN KEY (photo_id) REFERENCES photos(photo_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci; 
 
 INSERT INTO admin (username, password, first_name, last_name, position, email, phone, date_hired, departmant) VALUES ('admin', '7299f3488ded4e34277fd96afcdd911449b69b111aa45f6a2bd25d168f7a87f0', 'John', 'Smith', 'New Zealand', 'admin@willis.nz', '10211661231', '2023-12-12', 'admin');

@@ -162,7 +162,7 @@ body.loggedin {
   padding-right: 15px;
 }
 .content > div p {
-  padding: 5px;
+  padding: 0px;
   margin: 0 0 10px 0;
 }
 
@@ -204,7 +204,15 @@ body.loggedin {
 }
 .container label {
     display: block;
-    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+.container input[type="text"], textarea {
+    margin-bottom: 10px;
+}
+.container textarea {
+    width: 100%;
+    box-sizing: border-box;
 }
 input[type="text"],
 input[type="email"],
@@ -223,6 +231,7 @@ input[type="submit"] {
     background-color: #4a536e;
     color: #fff;
     cursor: pointer;
+    margin-top: 15px;
 }
 input[type="submit"]:hover {
     background-color: #364152;
@@ -264,7 +273,7 @@ input[type="submit"]:hover {
 
 .img_block {
     width: calc(25% - 20px);
-    height: 220px;
+    height: 240px;
     border: none;
     margin: 10px;
     margin-bottom: 20px;
@@ -304,9 +313,10 @@ input[type="submit"]:hover {
 
 .image-container img {
     display: block;
-    width: 90%;
-    height: auto;
-    margin-top: 20px;
+    width: 175px;
+    height: 175px;
+    object-fit: cover;
+    margin: 5px;
 }
 
 .table-container {
@@ -335,4 +345,6 @@ input[type="submit"]:hover {
 .table-container .center-align {
     text-align: center;
 }
+
+input[type="text"],
 

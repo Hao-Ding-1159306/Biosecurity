@@ -5,31 +5,41 @@
 {% else %}
 {% endif %}
 
-{% block title %}Agriculture{% endblock %}
+{% block title %}{{ agriculture.common_name }}{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Agriculture</h2>
-    <div class="msg">{{ msg }}</div>
-    <label for="agriculture_item_type">Item Type:</label>
-    <p>{{ agriculture.agriculture_item_type }}</p>
-    <label for="common_name">Common Name:</label>
-    <p>{{ agriculture.common_name }}</p>
-    <label for="scientific_name">Scientific Name:</label>
+    <h2>{{ agriculture.agriculture_item_type }}: {{ agriculture.common_name }}</h2>
+    <div class="image-container">
+        {% for photo in agriculture.photos %}
+        <img src="{{ url_for('static', filename=photo['photo_url']) }}" alt="photo">
+        {% endfor %}
+    </div>
+    <h3>Scientific Name:</h3>
     <p>{{ agriculture.scientific_name }}</p>
-    <label for="key_characteristics">Key Characteristics:</label>
-    <p>{{ agriculture.key_characteristics }}</p>
-    <label for="biology">Biology:</label>
-    <p>{{ agriculture.biology }}</p>
-    <label for="impacts">Impacts:</label>
-    <p>{{ agriculture.impacts }}</p>
-    <label for="control">Control:</label>
-    <p>{{ agriculture.control }}</p>
-    <label for="photos">Photos:</label>
-    {% for photo in agriculture.photos %}
-    <img src="{{ url_for('static', filename=photo['photo_url']) }}" alt="photo">
-    <p>{{ photo }}</p>
+
+    <h3>Key Characteristics:</h3>
+    {% for line in agriculture.key_characteristics.split('\n') %}
+    &#8226; {{ line }}<br>
     {% endfor %}
+
+    <h3>Biology:</h3>
+    {% for line in agriculture.biology.split('\n') %}
+    {% if line.strip() %}
+    &#8226; {{ line }}<br>
+    {% endif %}
+    {% endfor %}
+
+    <h3>Impacts:</h3>
+    {% for line in agriculture.impacts.split('\n') %}
+    &#8226; {{ line }}<br>
+    {% endfor %}
+
+    <h3>Control:</h3>
+    {% for line in agriculture.control.split('\n') %}
+    &#8226; {{ line }}<br>
+    {% endfor %}
+
 </div>
 
 {% endblock %}
