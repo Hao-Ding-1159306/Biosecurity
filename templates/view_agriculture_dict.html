@@ -1,0 +1,78 @@
+{% if session.get('role') == 'admin' %}
+{% extends 'admin_layout.html' %}
+{% elif session.get('role') == 'staff' %}
+{% extends 'staff_layout.html' %}
+{% else %}
+{% endif %}
+
+{% block title %}View Agronomists{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Edit Guide</h2>
+    <h3>Pest List</h3>
+    {% if pests %}
+    <table class="table-container">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Common Name</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for pest in pests %}
+        <tr>
+            <td>{{ pest.agriculture_id }}</td>
+            <td>{{ pest.common_name }}</td>
+            <td class="center-align"><a
+                    href="{{ url_for('edit_agriculture', agriculture_id=pest.agriculture_id) }}"><i
+                    class="fas fa-user-edit" aria-hidden="true"></i></a></td>
+            <td class="center-align"><a href="{{ url_for('delete_agriculture', agriculture_id=pest.agriculture_id) }}"><i
+                    class="fas fa-user-slash"
+                    aria-hidden="true"></i></a></td>
+
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+    <p>No Pest found.</p>
+    {% endif %}
+
+    <h3>Weeds List</h3>
+    {% if weeds %}
+    <table class="table-container">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Common Name</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for weed in weeds %}
+        <tr>
+            <td>{{ weed.agriculture_id }}</td>
+            <td>{{ weed.common_name }}</td>
+            <td class="center-align"><a
+                    href="{{ url_for('edit_agriculture', agriculture_id=weed.agriculture_id) }}"><i
+                    class="fas fa-user-edit" aria-hidden="true"></i></a></td>
+            <td class="center-align"><a href="{{ url_for('delete_agriculture', agriculture_id=weed.agriculture_id) }}"><i
+                    class="fas fa-user-slash"
+                    aria-hidden="true"></i></a></td>
+
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+    <p>No Pest found.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

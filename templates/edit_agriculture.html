@@ -1,0 +1,39 @@
+{% if session.get('role') == 'admin' %}
+{% extends 'admin_layout.html' %}
+{% elif session.get('role') == 'staff' %}
+{% extends 'staff_layout.html' %}
+{% else %}
+{% endif %}
+
+{% block title %}Edit Agriculture{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Edit: {{ agriculture.common_name }}</h2>
+    <form action="{{ url_for('edit_agriculture', agriculture_id=agriculture_id) }}" method="post">
+        <label for="agriculture_item_type">Type:</label>
+        <input type="text" name="agriculture_item_type" id="agriculture_item_type" value="{{ agriculture['agriculture_item_type'] }}" disabled><br>
+
+        <label for="common_name">Common Name:</label>
+        <input type="text" name="common_name" id="common_name" value="{{ agriculture['common_name'] }}" disabled><br>
+
+        <label for="scientific_name">Scientific Name:</label>
+        <input type="text" name="scientific_name" id="scientific_name" value="{{ agriculture['scientific_name'] }}" required><br>
+
+        <label for="key_characteristics">Key Characteristics:</label><br>
+        <textarea name="key_characteristics" id="key_characteristics" rows="4" cols="120" >{{ agriculture['key_characteristics'] }}</textarea><br>
+
+        <label for="biology">Biology:</label><br>
+        <textarea name="biology" id="biology" rows="4" cols="120">{{ agriculture['biology'] }}</textarea><br>
+
+        <label for="impacts">Impacts:</label><br>
+        <textarea name="impacts" id="impacts" rows="4" cols="120">{{ agriculture['impacts'] }}</textarea><br>
+
+        <label for="control">Control:</label><br>
+        <textarea name="control" id="control" rows="4" cols="120">{{ agriculture['control'] }}</textarea><br>
+        <input type="submit" value="Update">
+    </form>
+
+</div>
+
+{% endblock %}
