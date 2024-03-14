@@ -95,7 +95,7 @@ def get_staff_list():
     return return_results
 
 
-def search_pests():
+def search_pests_dict():
     cursor = get_cursor()
     cursor.execute(f"SELECT agriculture_id, common_name FROM agriculture WHERE agriculture_item_type = 'pest'")
     columns = [col[0] for col in cursor.description]
@@ -110,7 +110,7 @@ def search_pests():
     return return_results
 
 
-def search_weeds():
+def search_weeds_dict():
     cursor = get_cursor()
     cursor.execute(f"SELECT agriculture_id, common_name FROM agriculture WHERE agriculture_item_type = 'weed'")
     columns = [col[0] for col in cursor.description]
@@ -123,6 +123,20 @@ def search_weeds():
         result_dict['primary_photos'] = photo_url
         return_results.append(result_dict)
     return return_results
+
+def search_agriculture(agriculture_id):
+    cursor = get_cursor()
+    cursor.execute(f"SELECT * FROM agriculture WHERE agriculture_id = {agriculture_id}")
+    columns = [col[0] for col in cursor.description]
+    result = cursor.fetchone()
+    cursor.close()
+    if result:
+        result_dict = dict(zip(columns, result))
+        photo_dict = get_pictures(result_dict["agriculture_id"])
+        result_dict['photos'] = photo_dict
+        return result_dict
+    else:
+        return None
 
 
 def get_pictures(agriculture_id):

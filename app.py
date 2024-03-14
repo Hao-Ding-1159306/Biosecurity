@@ -18,7 +18,8 @@ from flask_hashing import Hashing
 from admin import admin_page
 from agronomists import agronomists_page
 from sql.sql import (get_agronomists_list, get_cursor, get_info, get_pictures,
-                     get_staff_list, search_pests, search_weeds)
+                     get_staff_list, search_agriculture, search_pests_dict,
+                     search_weeds_dict)
 from staff import staff_page
 
 app = Flask(__name__)
@@ -113,13 +114,20 @@ def home():
     if 'logged_in' not in session:
         print(session)
         return redirect(url_for('login'))
-
-    pests = search_pests()
-    print('pests:', pests)
-    weeds = search_weeds()
-    print('weeds:', weeds)
-
+    pests = search_pests_dict()
+    weeds = search_weeds_dict()
     return render_template('home.html', pests=pests, weeds=weeds)
+
+
+@app.route('/view_agriculture/<int:agriculture_id>')
+def view_agriculture(agriculture_id):
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    result_dict = search_agriculture(agriculture_id)
+    if result_dict is not None:
+        return render_template('view_agriculture.html', agriculture=result_dict)
+    else:
+        return url_for('home')
 
 
 @app.route('/profile')
@@ -322,7 +330,48 @@ def delete_staff(staff_id):
 def edit_guide():
     if 'logged_in' not in session:
         return redirect(url_for('login'))
-    return redirect(url_for(f"{session['role']}.manage"))
+    pests = search_pests_dict()
+    weeds = search_weeds_dict()
+    return render_template('view_agriculture_dict.html', pests=pests, weeds=weeds)
+
+
+@app.route('/edit_agriculture/<int:agriculture_id>', methods=['GET', 'POST'])
+def edit_agriculture(agriculture_id):
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        form_data = request.form
+        cursor = get_cursor()
+        sql = f"UPDATE agriculture SET "
+        update_values = []
+        for key, value in form_data.items():
+            if key != 'id':
+                sql += f"{key} = %s, "
+                update_values.append(value)
+        sql = sql.rstrip(', ')
+        sql += " WHERE agriculture_id = %s"
+        update_values.append(agriculture_id)
+        cursor.execute(sql, update_values)
+        cursor.close()
+        return redirect(url_for('edit_guide'))
+
+    agriculture = search_agriculture(agriculture_id)
+    if agriculture is not None:
+        return render_template('edit_agriculture.html', agriculture_id=agriculture_id, agriculture=agriculture)
+    else:
+        return url_for('edit_guide')
+
+
+@app.route('/delete_agriculture/<int:agriculture_id>', methods=['GET', 'POST'])
+def delete_agriculture(agriculture_id):
+    cursor = get_cursor()
+    sql = "DELETE FROM agriculture WHERE agriculture_id = %s"
+    cursor.execute(sql, (agriculture_id,))
+    cursor.close()
+    pests = search_pests_dict()
+    weeds = search_weeds_dict()
+    return render_template('view_agriculture_dict.html', pests=pests, weeds=weeds)
 
 
 @app.route('/add_guide', methods=['GET', 'POST'])
@@ -374,23 +423,6 @@ def add_guide():
             print(f'error: {e}')
             render_template('add_guide.html', msg=msg)
     return render_template('add_guide.html', msg=msg)
-
-
-@app.route('/view_agriculture/<int:agriculture_id>')
-def view_agriculture(agriculture_id):
-    if 'logged_in' not in session:
-        return redirect(url_for('login'))
-    cursor = get_cursor()
-    cursor.execute(f"SELECT * FROM agriculture WHERE agriculture_id = {agriculture_id}")
-    columns = [col[0] for col in cursor.description]
-    result = cursor.fetchone()
-    cursor.close()
-    if result:
-        result_dict = dict(zip(columns, result))
-        photo_dict = get_pictures(result_dict["agriculture_id"])
-        result_dict['photos'] = photo_dict
-        return render_template('view_agriculture.html', agriculture=result_dict)
-    return url_for('home')
 
 
 if __name__ == '__main__':
