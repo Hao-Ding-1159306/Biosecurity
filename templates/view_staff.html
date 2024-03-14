@@ -31,6 +31,11 @@
             <td>{{ result.last_name }}</td>
             <td>{{ result.email }}</td>
             <td>{{ result.phone }}</td>
+            <td class="center-align"><a href="{{ url_for('edit_profile', change_role='staff', change_id=result.id) }}"><i
+                    class="fas fa-user-edit" aria-hidden="true"></i></a></td>
+            <td class="center-align"><a href="{{ url_for('delete_staff', staff_id=result.id) }}"><i class="fas fa-user-slash"
+                                                                               aria-hidden="true"></i></a></td>
+
 
         </tr>
         {% endfor %}

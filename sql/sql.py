@@ -66,6 +66,7 @@ def get_info(id: int, role: str):
         return search_agronomists(id)
     raise ValueError
 
+
 def get_agronomists_list():
     cursor = get_cursor()
     cursor.execute(f"SELECT * FROM agronomists")
@@ -79,6 +80,7 @@ def get_agronomists_list():
         return_results.append(result_dict)
     return return_results
 
+
 def get_staff_list():
     cursor = get_cursor()
     cursor.execute(f"SELECT * FROM staff")
@@ -91,3 +93,66 @@ def get_staff_list():
         print(result_dict)
         return_results.append(result_dict)
     return return_results
+
+
+def search_pests():
+    cursor = get_cursor()
+    cursor.execute(f"SELECT agriculture_id, common_name FROM agriculture WHERE agriculture_item_type = 'pest'")
+    columns = [col[0] for col in cursor.description]
+    results = cursor.fetchall()
+    cursor.close()
+    return_results = list()
+    for result in results:
+        result_dict = dict(zip(columns, result))
+        photo_url = get_primary_picture(result_dict["agriculture_id"])
+        result_dict['primary_photos'] = photo_url
+        return_results.append(result_dict)
+    return return_results
+
+
+def search_weeds():
+    cursor = get_cursor()
+    cursor.execute(f"SELECT agriculture_id, common_name FROM agriculture WHERE agriculture_item_type = 'weed'")
+    columns = [col[0] for col in cursor.description]
+    results = cursor.fetchall()
+    cursor.close()
+    return_results = list()
+    for result in results:
+        result_dict = dict(zip(columns, result))
+        photo_url = get_primary_picture(result_dict["agriculture_id"])
+        result_dict['primary_photos'] = photo_url
+        return_results.append(result_dict)
+    return return_results
+
+
+def get_pictures(agriculture_id):
+    cursor = get_cursor()
+    cursor.execute("""
+            SELECT p.photo_id, p.photo_url, ap.is_primary
+            FROM photos p
+            JOIN agriculture_photos ap ON p.photo_id = ap.photo_id
+            WHERE ap.agriculture_id = %s
+        """, (agriculture_id,))
+    columns = [col[0] for col in cursor.description]
+    results = cursor.fetchall()
+    connection.close()
+    return_results = list()
+    for result in results:
+        result_dict = dict(zip(columns, result))
+        return_results.append(result_dict)
+    print(return_results)
+    return return_results
+
+def get_primary_picture(agriculture_id):
+    cursor = get_cursor()
+    cursor.execute("""
+                SELECT p.photo_url
+                FROM photos p
+                JOIN agriculture_photos ap ON p.photo_id = ap.photo_id
+                WHERE ap.is_primary = 1 AND ap.agriculture_id = %s
+            """, (agriculture_id,))
+    result = cursor.fetchone()
+    connection.close()
+    if result is not None:
+        return result[0]
+    return None

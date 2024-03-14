@@ -1,0 +1,45 @@
+{% if session.get('role') == 'admin' %}
+{% extends 'admin_layout.html' %}
+{% elif session.get('role') == 'staff' %}
+{% extends 'staff_layout.html' %}
+{% else %}
+{% endif %}
+
+{% block title %}{{ agriculture.common_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ agriculture.agriculture_item_type }}: {{ agriculture.common_name }}</h2>
+    <div class="image-container">
+        {% for photo in agriculture.photos %}
+        <img src="{{ url_for('static', filename=photo['photo_url']) }}" alt="photo">
+        {% endfor %}
+    </div>
+    <h3>Scientific Name:</h3>
+    <p>{{ agriculture.scientific_name }}</p>
+
+    <h3>Key Characteristics:</h3>
+    {% for line in agriculture.key_characteristics.split('\n') %}
+    &#8226; {{ line }}<br>
+    {% endfor %}
+
+    <h3>Biology:</h3>
+    {% for line in agriculture.biology.split('\n') %}
+    {% if line.strip() %}
+    &#8226; {{ line }}<br>
+    {% endif %}
+    {% endfor %}
+
+    <h3>Impacts:</h3>
+    {% for line in agriculture.impacts.split('\n') %}
+    &#8226; {{ line }}<br>
+    {% endfor %}
+
+    <h3>Control:</h3>
+    {% for line in agriculture.control.split('\n') %}
+    &#8226; {{ line }}<br>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

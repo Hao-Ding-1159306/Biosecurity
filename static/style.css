@@ -162,7 +162,7 @@ body.loggedin {
   padding-right: 15px;
 }
 .content > div p {
-  padding: 5px;
+  padding: 0px;
   margin: 0 0 10px 0;
 }
 
@@ -204,7 +204,15 @@ body.loggedin {
 }
 .container label {
     display: block;
-    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+.container input[type="text"], textarea {
+    margin-bottom: 10px;
+}
+.container textarea {
+    width: 100%;
+    box-sizing: border-box;
 }
 input[type="text"],
 input[type="email"],
@@ -223,6 +231,7 @@ input[type="submit"] {
     background-color: #4a536e;
     color: #fff;
     cursor: pointer;
+    margin-top: 15px;
 }
 input[type="submit"]:hover {
     background-color: #364152;
@@ -237,9 +246,10 @@ input[type="submit"]:hover {
 
 .block {
     width: calc(25% - 20px);
-    height: 200px;
+    height: 220px;
     border: 1px solid #ccc;
     margin: 10px;
+    margin-bottom: 20px;
     padding: 10px;
     text-align: center;
     background-color: #f0f0f0;
@@ -247,6 +257,8 @@ input[type="submit"]:hover {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .block i {
@@ -257,6 +269,54 @@ input[type="submit"]:hover {
 .block a {
     text-decoration: none;
     color: inherit;
+}
+
+.img_block {
+    width: calc(25% - 20px);
+    height: 240px;
+    border: none;
+    margin: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+    text-align: center;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.img_block i {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+.img_block a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.img_block p {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.image-container {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: auto;
+    justify-content: center;
+}
+
+.image-container img {
+    display: block;
+    width: 175px;
+    height: 175px;
+    object-fit: cover;
+    margin: 5px;
 }
 
 .table-container {
@@ -281,4 +341,10 @@ input[type="submit"]:hover {
 .table-container td {
     min-width: 100px;
 }
+
+.table-container .center-align {
+    text-align: center;
+}
+
+input[type="text"],
 

@@ -1,4 +1,11 @@
+{% if session.get('role') == 'admin' %}
+{% extends 'admin_layout.html' %}
+{% elif session.get('role') == 'staff' %}
+{% extends 'staff_layout.html' %}
+{% elif session.get('role') == 'agronomists' %}
 {% extends 'agronomists_layout.html' %}
+{% else %}
+{% endif %}
 
 {% block title %}Profile{% endblock %}
 
@@ -19,7 +26,7 @@
         <input type="email" id="email" name="email" value="{{ results['email'] }}">
 
         <label for="phone">Work Photo:</label>
-        <input type="text" id="phone" name="phone" value="{{ results['phone'] }}">
+        <input type="text" id="phone" name="phone" value="{{ results['phone'] }}" pattern="[1-9][0-9]{10}">
 
         <label for="date_joined">Date Joined:</label>
         <input type="text" id="date_joined" name="date_joined" value="{{ results['date_joined'] }}" disabled>

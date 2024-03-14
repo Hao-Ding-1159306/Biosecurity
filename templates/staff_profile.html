@@ -1,11 +1,18 @@
+{% if session.get('role') == 'admin' %}
+{% extends 'admin_layout.html' %}
+{% elif session.get('role') == 'staff' %}
 {% extends 'staff_layout.html' %}
+{% elif session.get('role') == 'agronomists' %}
+{% extends 'agronomists_layout.html' %}
+{% else %}
+{% endif %}
 
 {% block title %}Profile{% endblock %}
 
 {% block content %}
 <h2>{{ results['username'] }} Profile</h2>
 <div>
-    <p>Your account details are below:</p>
+    <p>Details are below:</p>
     <table>
         <tr>
             <td>ID:</td>

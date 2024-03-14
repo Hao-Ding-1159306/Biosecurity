@@ -8,17 +8,21 @@ Created on: 2024/3/6 14:34
 import binascii
 import os
 import re
+import uuid
 from datetime import datetime
 
 from flask import Flask, redirect, render_template, request, session, url_for
+from flask_caching import Cache
 from flask_hashing import Hashing
 
 from admin import admin_page
 from agronomists import agronomists_page
-from sql.sql import get_cursor, get_info, get_agronomists_list, get_staff_list
+from sql.sql import (get_agronomists_list, get_cursor, get_info, get_pictures,
+                     get_staff_list, search_pests, search_weeds)
 from staff import staff_page
 
 app = Flask(__name__)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 hashing = Hashing(app)
 app.secret_key = binascii.hexlify(os.urandom(24)).decode('utf-8')
@@ -106,9 +110,16 @@ def register():
 
 @app.route('/home')
 def home():
-    if 'logged_in' in session:
-        return render_template('home.html')
-    return redirect(url_for('login'))
+    if 'logged_in' not in session:
+        print(session)
+        return redirect(url_for('login'))
+
+    pests = search_pests()
+    print('pests:', pests)
+    weeds = search_weeds()
+    print('weeds:', weeds)
+
+    return render_template('home.html', pests=pests, weeds=weeds)
 
 
 @app.route('/profile')
@@ -185,9 +196,16 @@ def edit_profile(change_role, change_id):
         update_values.append(change_id)
         cursor.execute(sql, update_values)
         cursor.close()
-        results = get_info(change_id, change_role)
-        print('new result:', results)
-        return render_template(f'{role}_profile.html', results=results)
+        if role == change_role and id == change_id:
+            results = get_info(change_id, change_role)
+            print('new result:', results)
+            return render_template(f'{role}_profile.html', results=results)
+        elif change_role == 'agronomists':
+            return redirect(url_for('view_agronomists'))
+        elif change_role == 'staff':
+            return redirect(url_for('view_staff'))
+        else:
+            return redirect(url_for('home'))
     results = get_info(change_id, change_role)
     print('result:', results)
     return render_template(f'{change_role}_edit_profile.html', change_role=change_role, change_id=change_id,
@@ -238,6 +256,15 @@ def add_agronomists():
     return render_template('add_agronomists.html', msg=msg)
 
 
+@app.route('/delete_agronomists/<int:agronomists_id>', methods=['GET', 'POST'])
+def delete_agronomists(agronomists_id):
+    cursor = get_cursor()
+    sql = "DELETE FROM agronomists WHERE id = %s"
+    cursor.execute(sql, (agronomists_id,))
+    results = get_agronomists_list()
+    return render_template('view_agronomists.html', results=results)
+
+
 @app.route('/view_staff')
 def view_staff():
     if 'logged_in' not in session:
@@ -280,6 +307,90 @@ def add_staff():
             cursor.close()
             msg = 'You have successfully add a agronomist!'
     return render_template('add_staff.html', msg=msg)
+
+
+@app.route('/delete_staff/<int:staff_id>', methods=['GET', 'POST'])
+def delete_staff(staff_id):
+    cursor = get_cursor()
+    sql = "DELETE FROM staff WHERE id = %s"
+    cursor.execute(sql, (staff_id,))
+    results = get_staff_list()
+    return render_template('view_staff.html', results=results)
+
+
+@app.route('/edit_guide')
+def edit_guide():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    return redirect(url_for(f"{session['role']}.manage"))
+
+
+@app.route('/add_guide', methods=['GET', 'POST'])
+def add_guide():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    msg = ''
+    if request.method == 'POST':
+        agriculture_item_type = request.form['agriculture_item_type']
+        common_name = request.form['common_name']
+        scientific_name = request.form['scientific_name']
+        key_characteristics = request.form['key_characteristics']
+        biology = request.form['biology']
+        impacts = request.form['impacts']
+        control = request.form['control']
+        photos = request.files.getlist('photos')
+        print('photos:', photos)
+        try:
+            # add agriculture
+            cursor = get_cursor()
+            sql = "INSERT INTO agriculture (agriculture_item_type, common_name, scientific_name, key_characteristics, biology, impacts, control) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            cursor.execute(sql, (
+                agriculture_item_type, common_name, scientific_name, key_characteristics, biology, impacts, control))
+            agriculture_id = cursor.lastrowid
+            cursor.close()
+
+            # add photo
+            num = 1
+            for photo in photos:
+                filename = str(uuid.uuid4()) + os.path.splitext(photo.filename)[-1]
+                photo_path = os.path.join('static', filename)
+                photo.save(photo_path)
+
+                cursor = get_cursor()
+                sql = "INSERT INTO photos (photo_url) VALUES (%s)"
+                cursor.execute(sql, (filename,))
+                photo_id = cursor.lastrowid
+                cursor.close()
+                # build connect
+                cursor = get_cursor()
+                sql = "INSERT INTO agriculture_photos (agriculture_id, photo_id, is_primary) VALUES (%s, %s, CASE WHEN %s = 1 THEN TRUE ELSE FALSE END)"
+                cursor.execute(sql, (agriculture_id, photo_id, num,))
+                cursor.close()
+                num += 1
+            msg = 'You have successfully add a agronomist!'
+            render_template('add_guide.html', msg=msg)
+
+        except Exception as e:
+            print(f'error: {e}')
+            render_template('add_guide.html', msg=msg)
+    return render_template('add_guide.html', msg=msg)
+
+
+@app.route('/view_agriculture/<int:agriculture_id>')
+def view_agriculture(agriculture_id):
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    cursor = get_cursor()
+    cursor.execute(f"SELECT * FROM agriculture WHERE agriculture_id = {agriculture_id}")
+    columns = [col[0] for col in cursor.description]
+    result = cursor.fetchone()
+    cursor.close()
+    if result:
+        result_dict = dict(zip(columns, result))
+        photo_dict = get_pictures(result_dict["agriculture_id"])
+        result_dict['photos'] = photo_dict
+        return render_template('view_agriculture.html', agriculture=result_dict)
+    return url_for('home')
 
 
 if __name__ == '__main__':

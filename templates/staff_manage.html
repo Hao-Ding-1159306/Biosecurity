@@ -1,9 +1,9 @@
-{% extends 'admin_layout.html' %}
+{% extends 'staff_layout.html' %}
 
 {% block title %}Manage{% endblock %}
 
 {% block content %}
-<h2>Administrator Manage</h2>
+<h2>Staff Manage</h2>
 <div class="block_container">
     <div class="block">
         <a href="{{ url_for('view_agronomists') }}">
@@ -19,27 +19,14 @@
     </div>
 
     <div class="block">
-        <a href="{{ url_for('view_staff') }}">
-            <i class="fas fa-user-alt" aria-hidden="true"></i>
-            <p>View Staff</p>
-        </a>
-    </div>
-    <div class="block">
-        <a href="{{ url_for('add_staff') }}">
-            <i class="fas fa-user-plus" aria-hidden="true"></i>
-            <p>Add Staff</p>
-        </a>
-    </div>
-
-    <div class="block">
-        <a href="{{ url_for('edit_guide') }}">
+        <a href="edit_guide.html">
             <i class="fas fa-book-reader"></i>
             <p>Edit Guide</p>
         </a>
     </div>
 
     <div class="block">
-        <a href="{{ url_for('add_guide') }}">
+        <a href="add_guide.html">
             <i class="fa fa-edit" aria-hidden="true"></i>
             <p>Add Guide</p>
         </a>
